@@ -23,3 +23,6 @@ data/processed/
 # OS
 .DS_Store
 Thumbs.db
+
+# Files
+AI_Harness_Milestones.md
