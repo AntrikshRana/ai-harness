@@ -7,7 +7,7 @@ NOTE : for now generate() is empty.
 from abc import ABC,abstractmethod
 
 class BaseModel(ABC):
-    def _inti_(self,model_name:str):
+    def _init_(self,model_name:str):
         self.model_name = model_name
     @abstractmethod
     def generate(self, prompt: str) -> str:
