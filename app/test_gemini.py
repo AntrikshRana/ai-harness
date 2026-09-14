@@ -6,6 +6,6 @@ registry = ModelRegistry()
 
 registry.add("gemini",gemini)
 
-response = registry.get("gemini").generate("What is nd operating system in one sentence.")
+response = registry.get("gemini").generate("What is an operating system in one sentence.")
 
 print(response)

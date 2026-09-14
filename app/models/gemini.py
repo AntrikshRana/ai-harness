@@ -18,3 +18,9 @@ class GeminiModel(BaseModel):
             contents = prompt
         )
         return response.text
+    
+    def is_available(self) -> bool:
+        if(os.getenv("GEMINI_API_KEY")):
+            return True
+        
+        return False
