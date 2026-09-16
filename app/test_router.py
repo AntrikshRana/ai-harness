@@ -1,14 +1,20 @@
 from .harness.model_router import ModelRouter
 from .models.model_registry import ModelRegistry
-from .models.gemini import GeminiModel
 
+from .models.gemini import GeminiModel
 from .models.base_model import BaseModel
 
 import pytest
 
-# gemini = GeminiModel()
-# registry.add("gemini",gemini)
-# assert isinstance(model,GeminiModel),"Router did not return GeminiModel"
+class FakeModel(BaseModel):
+    def __init__(self,available):
+        self.available = available
+    
+    def generate(self,prompt: str) -> str:
+        return "Hi im a fake model"
+        
+    def is_available(self) -> bool:
+        return self.available
 
 # To test the normal routing.
 # Example : If gemini is available then call gemini
@@ -56,12 +62,12 @@ def test_no_model_available():
     with pytest.raises(RuntimeError):
         router.route("reasoning")
     
-class FakeModel(BaseModel):
-    def __init__(self,available):
-        self.available = available
+
+def test_unknown_task_type():
     
-    def generate(self,prompt: str) -> str:
-        return "Hi im a fake model"
-        
-    def is_available(self) -> bool:
-        return self.available
+    registry = ModelRegistry()
+      
+    router = ModelRouter(registry)
+    
+    with pytest.raises(ValueError):
+        router.route("translation")
