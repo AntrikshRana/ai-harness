@@ -1,5 +1,5 @@
-from .models.gemini import GeminiModel
-from .models.model_registry import ModelRegistry
+from app.models.gemini import GeminiModel
+from app.models.model_registry import ModelRegistry
 gemini = GeminiModel()
 
 registry = ModelRegistry()
