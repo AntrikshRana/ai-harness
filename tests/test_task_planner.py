@@ -50,3 +50,4 @@ def test_task_planner_normalizes_response():
     reponse = planner.plan("Uppercase return")
     
     assert reponse == "coding"
+    
