@@ -8,6 +8,7 @@ load_dotenv()
 
 class GeminiModel(BaseModel):
     def __init__(self):
+        super().__init__("gemini")
         self.client = genai.Client(
             api_key = os.getenv("GEMINI_API_KEY")
         )
