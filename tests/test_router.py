@@ -7,11 +7,12 @@ from app.models.base_model import BaseModel
 import pytest
 
 class FakeModel(BaseModel):
-    def __init__(self,available):
+    def __init__(self,available,name):
+        super().__init__(name)
         self.available = available
     
     def generate(self,prompt: str) -> str:
-        return "Hi im a fake model"
+        return f"Hi i'm fake {self.name}"
         
     def is_available(self) -> bool:
         return self.available
@@ -26,7 +27,8 @@ def test_normal_routing():
     
     router = ModelRouter(registry)
     
-    model = router.route("reasoning")
+    already_tried = []
+    model = router.route("reasoning",already_tried)
     
     assert isinstance(model,GeminiModel), "Not gemini model"
 
@@ -35,15 +37,16 @@ def test_normal_routing():
 def test_fallback_routing():
     registry = ModelRegistry()
     
-    fake_gemini = FakeModel(False)
-    fake_gpt = FakeModel(True)    
+    fake_gemini = FakeModel(False,"gemini")
+    fake_gpt = FakeModel(True,"gpt")    
     
-    registry.add("gemini",fake_gemini)
-    registry.add("gpt",fake_gpt)
+    registry.add(fake_gemini.name,fake_gemini)
+    registry.add(fake_gpt.name,fake_gpt)
         
     router = ModelRouter(registry)
-        
-    model = router.route("reasoning")
+    
+    already_tried = []
+    model = router.route("reasoning",already_tried)
     
     assert model is fake_gpt, "No model selected"
 
@@ -51,16 +54,17 @@ def test_fallback_routing():
 def test_no_model_available():
     registry = ModelRegistry()
     
-    fake_gemini = FakeModel(False)
-    fake_gpt = FakeModel(False)    
+    fake_gemini = FakeModel(False,"gemini")
+    fake_gpt = FakeModel(False,"gpt")    
     
-    registry.add("gemini",fake_gemini)
-    registry.add("gpt",fake_gpt)
+    registry.add(fake_gemini.name,fake_gemini)
+    registry.add(fake_gpt.name,fake_gpt)
         
     router = ModelRouter(registry)
-        
+    
+    already_tried = []
     with pytest.raises(RuntimeError):
-        router.route("reasoning")
+        router.route("reasoning",already_tried)
     
 
 def test_unknown_task_type():
@@ -69,5 +73,22 @@ def test_unknown_task_type():
       
     router = ModelRouter(registry)
     
+    already_tried = []
     with pytest.raises(ValueError):
-        router.route("translation")
+        router.route("translation",already_tried)
+
+def test_already_tried():
+    registry = ModelRegistry()
+    
+    fake_gemini = FakeModel(True,"gemini")
+    fake_gpt = FakeModel(True,"gpt")    
+    
+    registry.add(fake_gemini.name,fake_gemini)
+    registry.add(fake_gpt.name,fake_gpt)
+        
+    router = ModelRouter(registry)
+    
+    already_tried = ["gpt"]
+    model = router.route("coding",already_tried)
+   
+    assert model is fake_gemini

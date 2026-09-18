@@ -7,8 +7,10 @@ NOTE : for now generate() is empty.
 from abc import ABC,abstractmethod
 
 class BaseModel(ABC):
-    def _init_(self,model_name:str):
-        self.model_name = model_name
+    
+    def __init__(self,name:str):
+        self.name = name
+        
     @abstractmethod
     def generate(self, prompt: str) -> str:
         pass
@@ -16,3 +18,4 @@ class BaseModel(ABC):
     @abstractmethod 
     def is_available(self)->bool:
         pass 
+    

@@ -1,41 +1,50 @@
 from app.harness.orchestrator import Orchestrator
 
 class FakeModel():
+    def __init__(self,response,name,available):
+        self.response = response
+        self.name = name
+        self.available = available
+    
     def generate(self,prompt):
-        return "Generated response"
+        return self.response
     
     def is_available(self):
-        return True
+        return self.available
     
 class FakeTaskPlanner():
     def plan(self,prompt):
         return "coding"
     
 class FakeModelRouter():
-    def route(self,task_type):
-        fake_model = FakeModel()
-        return fake_model
+    
+    def __init__(self,fake_gemini,fake_gpt):
+        self.fake_gemini = fake_gemini
+        self.fake_gpt = fake_gpt
+    
+    def route(self,task_type,already_tried):
+        if "gemini" in already_tried:
+            return self.fake_gpt
+        return self.fake_gemini
 
+class FakeValidator:
+    def validate(self,response):
+        if response == "Good":
+            return True
+        return False
 
 def test_orchestrator():
-    fake_task_planner = FakeTaskPlanner()
-    fake_model_router = FakeModelRouter()
+    fake_gemini = FakeModel("Bad","gemini",True)
+    fake_gpt = FakeModel("Good","gpt",True)
     
-    orchestrator = Orchestrator(fake_task_planner,fake_model_router)
-    response = orchestrator.run("Write a python function")
+    fake_router = FakeModelRouter(fake_gemini,fake_gpt)
     
-    assert response == "Generated response"
-
-
-'''
-    def run(self,prompt):
-        fake_model = FakeModel()
+    fake_planner = FakeTaskPlanner()
     
-        planner = FakeTaskPlanner()
-        task = planner.plan(self.prompt)
+    fake_validator = FakeValidator()
     
-        router = FakeModelRouter()
-        response = router.route(task).generate()
+    orchestrator = Orchestrator(fake_planner,fake_router,fake_validator)
     
-        assert response == "Generated response"
-'''
+    response = orchestrator.run("Test prompt")
+    
+    assert response == "Good"
