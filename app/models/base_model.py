@@ -16,3 +16,4 @@ class BaseModel(ABC):
     @abstractmethod 
     def is_available(self)->bool:
         pass 
+    
